@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>出発まで — Japan trip prep</title>
+<style>
+:root{
+  --ink:#16202E;
+  --ink-soft:#3D4A5C;
+  --muted:#7A8696;
+  --paper:#EFF1EE;
+  --card:#FFFFFF;
+  --rule:#DDE1DC;
+  --rail:#15715A;
+  --hanko:#B8402C;
+  --hanko-wash:rgba(184,64,44,.08);
+  --jp:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --tabh:60px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--ui);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom));
+}
+.wrap{max-width:600px;margin:0 auto}
+
+/* ---------- header ---------- */
+header{
+  background:var(--ink);color:#fff;
+  padding:calc(14px + env(safe-area-inset-top)) 18px 14px;
+}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.count{display:flex;align-items:baseline;gap:8px}
+.count .n{font-size:40px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.count .u{font-family:var(--jp);font-size:15px;opacity:.75}
+.hdr-lbl{font-size:12.5px;opacity:.6;margin-bottom:3px}
+.datepick{
+  background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;
+  border-radius:6px;padding:6px 8px;font-size:13px;font-family:var(--ui);
+}
+.progbar{height:3px;background:rgba(255,255,255,.18);border-radius:2px;margin-top:14px;overflow:hidden}
+.progbar i{display:block;height:100%;background:var(--rail);border-radius:2px;transition:width .35s}
+.progtext{font-size:12px;opacity:.6;margin-top:7px}
+
+/* ---------- generic ---------- */
+main{padding:18px 16px 30px}
+.pane{display:none}
+.pane.on{display:block}
+h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 18px;line-height:1.45}
+.jp{font-family:var(--jp);line-height:1.85}
+
+/* ---------- today hero ---------- */
+.today{
+  background:var(--card);border-radius:2px;
+  border-left:4px solid var(--rail);
+  padding:16px 16px 14px;margin-bottom:22px;
+  box-shadow:0 1px 0 var(--rule);
+}
+.today .meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.today .focus{font-size:17px;font-weight:600;margin-bottom:10px;line-height:1.35}
+.today ul{margin:0;padding-left:17px;font-size:14.5px;color:var(--ink-soft)}
+.today li{margin-bottom:5px}
+.today li:last-child{margin-bottom:0}
+
+/* ---------- week / day grid ---------- */
+.week{margin-bottom:26px}
+.week-hd{display:flex;align-items:baseline;gap:10px;padding-bottom:7px;border-bottom:1.5px solid var(--ink)}
+.week-hd .wn{font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.week-hd .wt{font-size:16px;font-weight:600}
+.week-note{font-size:13.5px;color:var(--muted);margin:8px 0 4px;line-height:1.5}
+.day{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:12px 0;border-bottom:1px solid var(--rule);
+}
+.stamp{
+  flex:0 0 44px;height:44px;border-radius:50%;
+  border:1.5px solid var(--rule);background:var(--card);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12.5px;color:var(--muted);cursor:pointer;
+  font-variant-numeric:tabular-nums;
+  transition:transform .12s;
+}
+.stamp:active{transform:scale(.9)}
+.stamp.done{
+  border:2px solid var(--hanko);color:var(--hanko);
+  background:var(--hanko-wash);font-family:var(--jp);font-size:15px;font-weight:600;
+  transform:rotate(-7deg);
+}
+.day-body{flex:1;min-width:0}
+.day-focus{font-size:15px;font-weight:600;margin-bottom:3px;line-height:1.35}
+.day.done .day-focus{color:var(--muted)}
+.day-tasks{font-size:13.5px;color:var(--ink-soft);line-height:1.55}
+.day-tasks span:not(:last-child):after{content:" · ";color:var(--rule)}
+.day-mins{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* ---------- filter chips ---------- */
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:12px;margin:0 -16px 6px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;padding:7px 13px;border-radius:100px;
+  border:1px solid var(--rule);background:var(--card);
+  font-size:13.5px;color:var(--ink-soft);cursor:pointer;white-space:nowrap;
+}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+.toolbar{display:flex;justify-content:flex-end;gap:7px;margin-bottom:10px}
+ruby{ruby-position:over;-webkit-ruby-position:before}
+rt{font-size:.52em;font-weight:400;color:var(--muted);letter-spacing:0;
+   -webkit-text-fill-color:var(--muted)}
+.no-furigana rt{display:none}
+.e-ex,.line-jp{line-height:2.35}
+.no-furigana .e-ex,.no-furigana .line-jp{line-height:1.85}
+.s-read{font-family:var(--jp);font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.3}
+.no-furigana .s-read,.no-furigana .e-read{display:none}
+.tbtn{
+  background:none;border:1px solid var(--rule);border-radius:100px;
+  padding:5px 12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;font-family:var(--ui);
+}
+.tbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------- entries ---------- */
+.entry{
+  background:var(--card);padding:14px 15px;margin-bottom:2px;
+  border-left:3px solid transparent;cursor:pointer;
+}
+.entry.open{border-left-color:var(--rail)}
+.e-head{display:flex;gap:10px;align-items:baseline}
+.e-jp{font-family:var(--jp);font-size:19px;font-weight:600;line-height:1.5;flex:1;min-width:0}
+.e-read{font-family:var(--jp);font-size:13px;color:var(--muted);margin-top:1px}
+.e-tag{font-size:10.5px;color:var(--muted);border:1px solid var(--rule);border-radius:3px;padding:1px 5px;flex:0 0 auto;align-self:center}
+.e-en{font-size:14.5px;color:var(--ink-soft);margin-top:6px}
+.hidden-en .e-en{display:none}
+.hidden-en .entry.open .e-en{display:block}
+.e-detail{display:none;margin-top:11px;padding-top:11px;border-top:1px dashed var(--rule)}
+.entry.open .e-detail{display:block}
+.e-ex{font-family:var(--jp);font-size:16.5px;line-height:1.85;margin-bottom:3px}
+.e-exen{font-size:13.5px;color:var(--muted);line-height:1.5}
+.e-note{font-size:13px;color:var(--ink-soft);margin-top:8px;line-height:1.55;background:var(--paper);padding:8px 10px;border-radius:2px}
+.say{
+  flex:0 0 auto;width:30px;height:30px;border-radius:50%;border:1px solid var(--rule);
+  background:var(--card);color:var(--ink-soft);cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;align-self:center;
+}
+.say:active{background:var(--paper)}
+
+/* ---------- dialogues ---------- */
+.dlg{background:var(--card);padding:16px;margin-bottom:14px}
+.dlg h3{font-size:15.5px;font-weight:600;margin:0 0 3px}
+.dlg .scene{font-size:13px;color:var(--muted);margin:0 0 13px}
+.line{display:flex;gap:10px;margin-bottom:11px;align-items:flex-start}
+.who{
+  flex:0 0 38px;font-size:11px;color:var(--muted);padding-top:5px;
+}
+.line.you .who{color:var(--rail);font-weight:600}
+.line-body{flex:1;min-width:0}
+.line-jp{font-family:var(--jp);font-size:17px;line-height:1.8}
+.line.you .line-jp{font-weight:600}
+.line-en{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.45}
+.hidden-en .line-en{display:none}
+
+/* ---------- signs ---------- */
+.signgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:2px}
+.sign{background:var(--card);padding:12px 8px;text-align:center;cursor:pointer}
+.sign .s-jp{font-family:var(--jp);font-size:21px;font-weight:600;line-height:1.4}
+.sign .s-en{font-size:11.5px;margin-top:3px;color:var(--muted);margin-top:4px;line-height:1.35;min-height:1em}
+.hidden-en .sign .s-en{visibility:hidden}
+.sign.open .s-en{visibility:visible!important}
+
+.callout{
+  background:var(--card);border-left:3px solid var(--hanko);
+  padding:13px 15px;font-size:14px;line-height:1.6;color:var(--ink-soft);margin-bottom:20px;
+}
+.callout b{color:var(--ink);font-weight:600}
+
+/* ---------- tab bar ---------- */
+nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:20;
+  background:rgba(255,255,255,.94);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-top:1px solid var(--rule);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-in{max-width:600px;margin:0 auto;display:flex;height:var(--tabh)}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  border:none;background:none;cursor:pointer;color:var(--muted);font-family:var(--ui);padding:0;
+}
+.tab .t-jp{font-family:var(--jp);font-size:17px;line-height:1}
+.tab .t-en{font-size:10px;letter-spacing:.01em}
+.tab.on{color:var(--ink)}
+.tab.on .t-jp{color:var(--rail)}
+:focus-visible{outline:2px solid var(--rail);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-lbl">Departure</div>
+      <div class="count"><span class="n" id="days">–</span><span class="u">日</span></div>
+    </div>
+    <input type="date" class="datepick" id="tripdate">
+  </div>
+  <div class="progbar"><i id="pbar" style="width:0%"></i></div>
+  <div class="progtext" id="ptext">0 of 36 days stamped</div>
+</header>
+
+<main>
+  <!-- PLAN -->
+  <section class="pane on" id="p-plan">
+    <div id="todaybox"></div>
+    <div id="weeks"></div>
+    <div class="callout" style="margin-top:24px">
+      <b>Short on time?</b> Weeks 1 and 2 are reactivation — if you're starting late, compress them into one week by doing two days' grammar per session. Never skip weeks 5 and 6; rehearsal is what converts knowing into speaking.
+    </div>
+  </section>
+
+  <!-- GRAMMAR -->
+  <section class="pane" id="p-gram">
+    <h2>Grammar</h2>
+    <p class="sub">Tap any point to see an example. Everything here is N4–N3 you have met before — you're rebuilding recall speed, not learning it.</p>
+    <div class="chips" id="gchips"></div>
+    <div class="toolbar"><button class="tbtn on" id="gfuri">Furigana on</button><button class="tbtn" id="ghide">Hide English</button></div>
+    <div id="glist"></div>
+  </section>
+
+  <!-- VOCAB -->
+  <section class="pane" id="p-vocab">
+    <h2>Vocabulary</h2>
+    <p class="sub">Grouped by where you'll actually need it. Tap the circle to hear it.</p>
+    <div class="chips" id="vchips"></div>
+    <div class="toolbar"><button class="tbtn" id="vhide">Hide English</button></div>
+    <div id="vlist"></div>
+  </section>
+
+  <!-- PHRASES -->
+  <section class="pane" id="p-phr">
+    <h2>Conversations</h2>
+    <p class="sub">Staff lines are in the polite register you'll actually hear. You don't need to produce keigo — you need to recognise it fast.</p>
+    <div class="callout">
+      <b>How to use these:</b> read your lines aloud, then play the whole thing back with the staff lines only. The gap isn't your Japanese — it's the half-second it takes to parse ～でよろしいでしょうか under pressure.
+    </div>
+    <div class="toolbar"><button class="tbtn on" id="dfuri">Furigana on</button><button class="tbtn" id="dhide">Hide English</button></div>
+    <div id="dlist"></div>
+  </section>
+
+  <!-- SIGNS -->
+  <section class="pane" id="p-sign">
+    <h2>Signage</h2>
+    <p class="sub">Reading signs is a separate skill from reading sentences. These 48 cover most of what you'll see on a trip.</p>
+    <div class="chips" id="schips"></div>
+    <div class="toolbar"><button class="tbtn" id="shide">Hide English</button></div>
+    <div id="slist"></div>
+  </section>
+</main>
+</div>
+
+<nav>
+  <div class="nav-in">
+    <button class="tab on" data-p="plan"><span class="t-jp">計</span><span class="t-en">Plan</span></button>
+    <button class="tab" data-p="gram"><span class="t-jp">文</span><span class="t-en">Grammar</span></button>
+    <button class="tab" data-p="vocab"><span class="t-jp">語</span><span class="t-en">Words</span></button>
+    <button class="tab" data-p="phr"><span class="t-jp">話</span><span class="t-en">Talk</span></button>
+    <button class="tab" data-p="sign"><span class="t-jp">標</span><span class="t-en">Signs</span></button>
+  </div>
+</nav>
+
+<script>
+/* ============ storage (persists if available, memory if not) ============ */
+const mem={};
+const store={
+  async get(k){
+    try{ const v=localStorage.getItem(k); if(v!==null) return v; }catch(e){}
+    try{ if(window.storage){const r=await window.storage.get(k); if(r) return r.value;} }catch(e){}
+    return mem[k]??null;
+  },
+  async set(k,v){
+    mem[k]=v;
+    let ok=false;
+    try{ localStorage.setItem(k,v); ok=true; }catch(e){}
+    try{ if(window.storage) await window.storage.set(k,v); }catch(e){}
+    return ok;
+  }
+};
+let state={done:{},trip:"2026-10-15"};
+
+/* ============ speech ============ */
+function say(t){
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(t);
+    u.lang="ja-JP"; u.rate=.85;
+    const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.toLowerCase().startsWith("ja"));
+    if(v)u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+if(window.speechSynthesis) speechSynthesis.getVoices();
+
+/* ============ DATA (generated from content.json) ============ */
+const PLAN=[{"n": 1, "t": "Wake it up", "note": "Do not study carefully this week. Move fast and let recognition come back. Anything that feels unfamiliar, flag it and move on — you'll meet it again in week 5.", "days": [{"f": "N4 grammar sweep, first half", "k": ["Grammar → Week 1", "points 1–10"], "m": 25}, {"f": "N4 grammar sweep, second half", "k": ["Grammar → Week 1", "points 11–20"], "m": 25}, {"f": "Greetings and the transaction script", "k": ["Words → Basics", "Talk → Convenience store"], "m": 25}, {"f": "Requests and permission", "k": ["Grammar → Week 1", "points 21–28"], "m": 25}, {"f": "Arrival vocabulary", "k": ["Words → Airport", "Talk → Immigration"], "m": 30}, {"f": "First recall test", "k": ["Grammar → Week 1 with English hidden"], "m": 20}]}, {"n": 2, "t": "Trains and the te-form family", "note": "Transit is where you'll speak most and where the vocabulary is most predictable. Front-load it.", "days": [{"f": "Station and train words", "k": ["Words → Trains", "Signs → Station"], "m": 30}, {"f": "Buying and asking", "k": ["Talk → Ticket window", "read your lines aloud"], "m": 25}, {"f": "Direction language", "k": ["Words → Directions", "Grammar → ～と, ～たら"], "m": 25}, {"f": "Asking a stranger", "k": ["Talk → Asking directions", "shadow it twice"], "m": 25}, {"f": "Signage drill", "k": ["Signs → Station + Street"], "m": 20}, {"f": "Week 1 + 2 grammar, English hidden", "k": ["time yourself; under 8 minutes"], "m": 25}]}, {"n": 3, "t": "Eating and buying", "note": "Restaurants are the highest-frequency, highest-anxiety interaction. Rehearse until the opening line is automatic.", "days": [{"f": "N3 grammar, first set", "k": ["Grammar → Week 3", "points 29–38"], "m": 30}, {"f": "Restaurant words", "k": ["Words → Restaurant"], "m": 25}, {"f": "Ordering, start to finish", "k": ["Talk → Restaurant", "Talk → Paying"], "m": 30}, {"f": "Shopping and the register", "k": ["Words → Shopping", "Talk → Shop counter"], "m": 25}, {"f": "Keigo you'll hear, not say", "k": ["Grammar → Keigo", "Signs → Shop"], "m": 25}, {"f": "Recall test: week 3", "k": ["Grammar + Words, English hidden"], "m": 20}]}, {"n": 4, "t": "Staying and navigating", "note": "By now the grammar tab should feel boring. That's the goal — boredom means retrieval is fast.", "days": [{"f": "N3 grammar, second set", "k": ["Grammar → Week 4", "points 39–48"], "m": 30}, {"f": "Hotel words", "k": ["Words → Hotel", "Talk → Check-in"], "m": 25}, {"f": "Travelling with family", "k": ["Words → With family", "Talk → Kids in a restaurant"], "m": 25}, {"f": "Making a request politely", "k": ["Grammar → ～ていただけませんか", "Talk → Asking a favour"], "m": 25}, {"f": "Sign reading, full sweep", "k": ["Signs → all sets, English hidden"], "m": 20}, {"f": "Cumulative grammar test", "k": ["Grammar → all, English hidden"], "m": 30}]}, {"n": 5, "t": "Trouble and speed", "note": "Two things break travellers: something goes wrong, and people speak at normal speed. Fix both now.", "days": [{"f": "Health and pharmacy", "k": ["Words → Health", "Talk → Pharmacy"], "m": 30}, {"f": "When something goes wrong", "k": ["Words → Trouble", "Talk → Lost item"], "m": 25}, {"f": "Numbers, dates, counters at speed", "k": ["Words → Numbers", "say every one aloud"], "m": 20}, {"f": "Shadowing block", "k": ["Talk → any 4 dialogues", "speak aloud, half a beat behind"], "m": 25}, {"f": "Listening at natural speed", "k": ["podcast, 15 min, no notes", "then Talk → Restaurant aloud"], "m": 25}, {"f": "Weak-point sweep", "k": ["anything you flagged in weeks 1–4"], "m": 30}]}, {"n": 6, "t": "Run it through", "note": "No new material this week. You are rehearsing, not learning. Aim to finish the week slightly bored and confident.", "days": [{"f": "Full dialogue run: arrival day", "k": ["Talk → Immigration, Taxi, Check-in"], "m": 25}, {"f": "Full dialogue run: an ordinary day", "k": ["Talk → Ticket, Directions, Restaurant"], "m": 25}, {"f": "Full dialogue run: something's wrong", "k": ["Talk → Pharmacy, Lost item, Asking a favour"], "m": 25}, {"f": "Grammar, all six weeks, hidden", "k": ["under 12 minutes"], "m": 25}, {"f": "Vocabulary, all sets, hidden", "k": ["flag nothing; just read"], "m": 25}, {"f": "Nothing new. Listen and rest.", "k": ["podcast on the way in", "favourite dialogue on the way home"], "m": 20}]}];
+const G=[{"w": 1, "jp": "～たいんですが", "en": "I'd like to… (softened request)", "ex": "予約したいんですが。", "exr": "予約[よやく]したいんですが。", "exen": "I'd like to make a reservation.", "note": "んですが at the end is the single most useful thing in this list. It turns a blunt statement into an opening move and invites the other person to help."}, {"w": 1, "jp": "～てもいいですか", "en": "May I…?", "ex": "写真を撮ってもいいですか。", "exr": "写真[しゃしん]を撮[と]ってもいいですか。", "exen": "May I take a photo?"}, {"w": 1, "jp": "～てはいけません", "en": "You must not…", "ex": "ここで食べてはいけません。", "exr": "ここで食[た]べてはいけません。", "exen": "You mustn't eat here.", "note": "You'll mostly hear this as ご遠慮ください on signs — a softer 'please refrain'."}, {"w": 1, "jp": "～なければなりません", "en": "Must, have to", "ex": "靴を脱がなければなりません。", "exr": "靴[くつ]を脱[ぬ]がなければなりません。", "exen": "You have to take your shoes off."}, {"w": 1, "jp": "～ないでください", "en": "Please don't…", "ex": "ここに置かないでください。", "exr": "ここに置[お]かないでください。", "exen": "Please don't put it here."}, {"w": 1, "jp": "Potential form ～える", "en": "Can, be able to", "ex": "カードで払えますか。", "exr": "カードで払[はら]えますか。", "exen": "Can I pay by card?", "note": "Potential form beats ことができる in speech. Shorter, and it's what you'll hear."}, {"w": 1, "jp": "～たことがあります", "en": "Have done before", "ex": "日本に来たことがあります。", "exr": "日本[にほん]に来[き]たことがあります。", "exen": "I've been to Japan before."}, {"w": 1, "jp": "～たら", "en": "When / if", "ex": "着いたら電話します。", "exr": "着[つ]いたら電話[でんわ]します。", "exen": "I'll call when I arrive.", "note": "When in doubt between ～たら, ～ば and ～と, use ～たら. It's the most forgiving."}, {"w": 1, "jp": "～ば", "en": "If (conditional)", "ex": "早く行けば座れます。", "exr": "早[はや]く行[い]けば座[すわ]れます。", "exen": "If we go early we can get a seat."}, {"w": 1, "jp": "～と", "en": "Whenever / then (automatic result)", "ex": "まっすぐ行くと駅があります。", "exr": "まっすぐ行[い]くと駅[えき]があります。", "exen": "Go straight and the station is there.", "note": "This is the form used for directions. Expect it constantly when you ask the way."}, {"w": 1, "jp": "～と思います", "en": "I think…", "ex": "たぶん混むと思います。", "exr": "たぶん混[こ]むと思[おも]います。", "exen": "I think it'll be crowded."}, {"w": 1, "jp": "～そうです (hearsay)", "en": "I hear that…", "ex": "明日は雨だそうです。", "exr": "明日[あした]は雨[あめ]だそうです。", "exen": "I hear it'll rain tomorrow."}, {"w": 1, "jp": "～そうです (appearance)", "en": "Looks like…", "ex": "おいしそうですね。", "exr": "おいしそうですね。", "exen": "That looks delicious."}, {"w": 1, "jp": "～ようです / ～みたいです", "en": "Seems, appears", "ex": "閉まっているようです。", "exr": "閉[し]まっているようです。", "exen": "It seems to be closed."}, {"w": 1, "jp": "～らしいです", "en": "Apparently", "ex": "あの店は有名らしいです。", "exr": "あの店[みせ]は有名[ゆうめい]らしいです。", "exen": "That shop is apparently famous."}, {"w": 1, "jp": "～ながら", "en": "While doing", "ex": "歩きながら食べないでください。", "exr": "歩[ある]きながら食[た]べないでください。", "exen": "Please don't eat while walking.", "note": "Worth knowing as a rule, not just grammar — eating while walking is frowned on in most of Japan."}, {"w": 1, "jp": "～てしまいました", "en": "Ended up… (regret)", "ex": "傘をなくしてしまいました。", "exr": "傘[かさ]をなくしてしまいました。", "exen": "I've gone and lost my umbrella."}, {"w": 1, "jp": "～ておきます", "en": "Do in advance", "ex": "予約しておきました。", "exr": "予約[よやく]しておきました。", "exen": "I booked it in advance."}, {"w": 1, "jp": "～てみます", "en": "Try doing", "ex": "食べてみます。", "exr": "食[た]べてみます。", "exen": "I'll give it a try."}, {"w": 1, "jp": "～すぎます", "en": "Too much", "ex": "ちょっと辛すぎます。", "exr": "ちょっと辛[から]すぎます。", "exen": "It's a bit too spicy."}, {"w": 1, "jp": "～やすい / ～にくい", "en": "Easy / hard to do", "ex": "この地図は分かりやすいです。", "exr": "この地図[ちず]は分[わ]かりやすいです。", "exen": "This map is easy to understand."}, {"w": 1, "jp": "～はずです", "en": "Should be (expectation)", "ex": "三時に着くはずです。", "exr": "三時[さんじ]に着[つ]くはずです。", "exen": "We should arrive at three."}, {"w": 1, "jp": "～かもしれません", "en": "Might, may", "ex": "遅れるかもしれません。", "exr": "遅[おく]れるかもしれません。", "exen": "We might be late."}, {"w": 1, "jp": "～ています (state)", "en": "Is in the state of", "ex": "あの店はもう開いていますか。", "exr": "あの店[みせ]はもう開[あ]いていますか。", "exen": "Is that shop open yet?", "note": "開いています = is open, not is opening. This trips people up on every trip."}, {"w": 1, "jp": "～てあります", "en": "Has been done (and remains)", "ex": "ここに書いてあります。", "exr": "ここに書[か]いてあります。", "exen": "It's written here."}, {"w": 1, "jp": "Passive ～られる", "en": "Passive", "ex": "財布を盗まれました。", "exr": "財布[さいふ]を盗[ぬす]まれました。", "exen": "My wallet was stolen."}, {"w": 1, "jp": "～させてください", "en": "Please let me…", "ex": "写真を撮らせてください。", "exr": "写真[しゃしん]を撮[と]らせてください。", "exen": "Please let me take a photo."}, {"w": 1, "jp": "～ていただけませんか", "en": "Could you please…?", "ex": "もう一度言っていただけませんか。", "exr": "もう一度[いちど]言[い]っていただけませんか。", "exen": "Could you say that once more?", "note": "Memorise this one whole. It is the politest thing you can say when you didn't catch something, and it never fails."}, {"w": 3, "jp": "～ようにします", "en": "Make an effort to", "ex": "忘れないようにします。", "exr": "忘[わす]れないようにします。", "exen": "I'll make sure not to forget."}, {"w": 3, "jp": "～ようになりました", "en": "Have come to be able to", "ex": "少し話せるようになりました。", "exr": "少[すこ]し話[はな]せるようになりました。", "exen": "I've become able to speak a little."}, {"w": 3, "jp": "～ために", "en": "For the purpose of", "ex": "観光のために来ました。", "exr": "観光[かんこう]のために来[き]ました。", "exen": "I'm here for sightseeing.", "note": "Exactly what you say at immigration."}, {"w": 3, "jp": "～ので", "en": "Because (soft)", "ex": "日本語が下手なので、ゆっくりお願いします。", "exr": "日本語[にほんご]が下手[へた]なので、ゆっくりお願[ねが]いします。", "exen": "My Japanese is poor, so slowly please."}, {"w": 3, "jp": "～のに", "en": "Even though", "ex": "予約したのに席がありません。", "exr": "予約[よやく]したのに席[せき]がありません。", "exen": "Even though I booked, there's no table."}, {"w": 3, "jp": "～まま", "en": "As it is, unchanged", "ex": "靴を履いたまま入らないでください。", "exr": "靴[くつ]を履[は]いたまま入[はい]らないでください。", "exen": "Please don't come in with your shoes on."}, {"w": 3, "jp": "～とおりに", "en": "Just as, according to", "ex": "説明のとおりにしました。", "exr": "説明[せつめい]のとおりにしました。", "exen": "I did it as explained."}, {"w": 3, "jp": "～によって", "en": "Depending on / by means of", "ex": "店によって違います。", "exr": "店[みせ]によって違[ちが]います。", "exen": "It varies by shop."}, {"w": 3, "jp": "～ばかりです", "en": "Only just did", "ex": "さっき着いたばかりです。", "exr": "さっき着[つ]いたばかりです。", "exen": "I only just arrived."}, {"w": 3, "jp": "～うちに", "en": "While (a state lasts)", "ex": "熱いうちに召し上がってください。", "exr": "熱[あつ]いうちに召[め]し上[あ]がってください。", "exen": "Please eat it while it's hot.", "note": "You will hear this exact sentence in restaurants."}, {"w": 3, "jp": "～ずに", "en": "Without doing", "ex": "予約せずに行きました。", "exr": "予約[よやく]せずに行[い]きました。", "exen": "I went without booking."}, {"w": 4, "jp": "～わけではありません", "en": "It's not that…", "ex": "嫌いなわけではありません。", "exr": "嫌[きら]いなわけではありません。", "exen": "It's not that I dislike it."}, {"w": 4, "jp": "～はずがありません", "en": "Couldn't possibly", "ex": "そんなに高いはずがありません。", "exr": "そんなに高[たか]いはずがありません。", "exen": "It can't possibly be that expensive."}, {"w": 4, "jp": "～たびに", "en": "Every time", "ex": "来るたびに新しい店ができています。", "exr": "来[く]るたびに新[あたら]しい店[みせ]ができています。", "exen": "Every time I come there's a new shop."}, {"w": 4, "jp": "～さえ～ば", "en": "If only", "ex": "時間さえあれば行きたいです。", "exr": "時間[じかん]さえあれば行[い]きたいです。", "exen": "If only I had time, I'd like to go."}, {"w": 4, "jp": "～こと / ～の (nominaliser)", "en": "Turning a verb into a noun", "ex": "歩くのが好きです。", "exr": "歩[ある]くのが好[す]きです。", "exen": "I like walking."}, {"w": 4, "jp": "～place に対して", "en": "Toward, regarding", "ex": "子供に対して優しいお店です。", "exr": "子供[こども]に対[たい]して優[やさ]しいお店[みせ]です。", "exen": "It's a shop that's good with children."}, {"w": 4, "jp": "Keigo: ～でございます", "en": "Polite 'is' — hear it, don't say it", "ex": "こちらがメニューでございます。", "exr": "こちらがメニューでございます。", "exen": "Here is the menu.", "note": "Staff will use this constantly. Just parse it as です and move on."}, {"w": 4, "jp": "Keigo: ～になります", "en": "'That comes to…' at a register", "ex": "三千円になります。", "exr": "三千円[さんぜんえん]になります。", "exen": "That'll be 3,000 yen."}, {"w": 4, "jp": "Keigo: 少々お待ちください", "en": "One moment please", "ex": "少々お待ちください。", "exr": "少々[しょうしょう]お待[ま]ちください。", "exen": "Please wait a moment.", "note": "Set phrase. Learn it as a single sound, not as grammar."}, {"w": 4, "jp": "Keigo: ～でよろしいでしょうか", "en": "Is … all right? (confirming)", "ex": "お会計はご一緒でよろしいでしょうか。", "exr": "お会計[かいけい]はご一緒[いっしょ]でよろしいでしょうか。", "exen": "Would you like to pay together?", "note": "The single most-missed question by travellers. It means: are you paying as one bill or separately?"}, {"w": 4, "jp": "Keigo: かしこまりました", "en": "Certainly (staff acknowledging)", "ex": "かしこまりました。", "exr": "かしこまりました。", "exen": "Certainly."}, {"w": 4, "jp": "Keigo: ご覧ください / お召し上がりください", "en": "Please look / please eat", "ex": "どうぞお召し上がりください。", "exr": "どうぞお召[め]し上[あ]がりください。", "exen": "Please go ahead and eat."}];
+const V=[{"c": "Basics", "items": [["すみません", "excuse me / sorry / thank you", null], ["お願いします", "please", "おねがいします"], ["ありがとうございます", "thank you", null], ["大丈夫です", "I'm fine / it's fine / no thanks", "だいじょうぶです"], ["けっこうです", "no thank you (declining)", null], ["はい / いいえ", "yes / no", null], ["ちょっと待ってください", "one moment please", "ちょっとまってください"], ["日本語が少しだけ話せます", "I speak only a little Japanese", "にほんごが すこしだけ はなせます"], ["英語を話せる方はいますか", "is there someone who speaks English?", "えいごを はなせる かたは いますか"], ["ゆっくりお願いします", "slowly, please", "ゆっくり おねがいします"], ["もう一度お願いします", "once more, please", "もういちど おねがいします"], ["これ / それ / あれ", "this / that / that over there", null], ["いくらですか", "how much is it?", null], ["どこですか", "where is it?", null], ["何時ですか", "what time is it?", "なんじですか"], ["わかりました", "understood", null], ["わかりません", "I don't understand", null]]}, {"c": "Airport", "items": [["観光です", "sightseeing (purpose of visit)", "かんこうです"], ["家族旅行です", "it's a family trip", "かぞく りょこうです"], ["一週間です", "one week", "いっしゅうかんです"], ["ホテルに泊まります", "I'm staying at a hotel", "ホテルに とまります"], ["入国審査", "immigration", "にゅうこく しんさ"], ["税関", "customs", "ぜいかん"], ["手荷物受取所", "baggage claim", "てにもつ うけとりじょ"], ["荷物", "luggage", "にもつ"], ["スーツケース", "suitcase", null], ["両替", "currency exchange", "りょうがえ"], ["交通系ICカード", "transit IC card (Suica etc.)", "こうつうけい アイシーカード"], ["空港バス", "airport bus", "くうこうバス"], ["到着", "arrival", "とうちゃく"], ["出発", "departure", "しゅっぱつ"], ["搭乗券", "boarding pass", "とうじょうけん"]]}, {"c": "Trains", "items": [["駅", "station", "えき"], ["切符", "ticket", "きっぷ"], ["改札", "ticket gate", "かいさつ"], ["ホーム", "platform", null], ["何番線", "which platform number", "なんばんせん"], ["各駅停車", "local (stops everywhere)", "かくえき ていしゃ"], ["快速", "rapid", "かいそく"], ["急行", "express", "きゅうこう"], ["特急", "limited express", "とっきゅう"], ["普通", "local / ordinary", "ふつう"], ["指定席", "reserved seat", "していせき"], ["自由席", "unreserved seat", "じゆうせき"], ["乗り換え", "transfer", "のりかえ"], ["次の駅", "next station", "つぎの えき"], ["終電", "last train", "しゅうでん"], ["始発", "first train", "しはつ"], ["この電車は〜に止まりますか", "does this train stop at …?", "この でんしゃは 〜に とまりますか"], ["〜行き", "bound for …", "〜ゆき"], ["みどりの窓口", "JR ticket office", "みどりの まどぐち"], ["一日乗車券", "one-day pass", "いちにち じょうしゃけん"]]}, {"c": "Directions", "items": [["まっすぐ", "straight ahead", null], ["右 / 左", "right / left", "みぎ / ひだり"], ["曲がる", "to turn", "まがる"], ["渡る", "to cross", "わたる"], ["近い / 遠い", "near / far", "ちかい / とおい"], ["歩いて何分ですか", "how many minutes on foot?", "あるいて なんぷんですか"], ["この辺に", "around here", "この へんに"], ["向かい", "opposite", "むかい"], ["隣", "next to", "となり"], ["角", "corner", "かど"], ["信号", "traffic light", "しんごう"], ["交差点", "intersection", "こうさてん"], ["出口", "exit", "でぐち"], ["〜番出口", "exit number …", "〜ばん でぐち"], ["地図で見せていただけますか", "could you show me on the map?", "ちずで みせて いただけますか"]]}, {"c": "Restaurant", "items": [["何名様ですか", "how many people? (you'll be asked this)", "なんめいさまですか"], ["三人です", "three people", "さんにんです"], ["禁煙席", "non-smoking seat", "きんえんせき"], ["メニュー", "menu", null], ["英語のメニューはありますか", "is there an English menu?", "えいごの メニューは ありますか"], ["おすすめは何ですか", "what do you recommend?", "おすすめは なんですか"], ["これをください", "this one, please", null], ["注文お願いします", "I'd like to order", "ちゅうもん おねがいします"], ["お会計お願いします", "the bill, please", "おかいけい おねがいします"], ["別々でお願いします", "separately, please", "べつべつで おねがいします"], ["一緒でお願いします", "together, please", "いっしょで おねがいします"], ["食べ放題", "all you can eat", "たべほうだい"], ["飲み放題", "all you can drink", "のみほうだい"], ["おかわり", "refill / seconds", null], ["水", "water", "みず"], ["お茶", "tea", "おちゃ"], ["生ビール", "draft beer", "なまビール"], ["辛い", "spicy", "からい"], ["甘い", "sweet", "あまい"], ["アレルギーがあります", "I have an allergy", null], ["〜が入っていますか", "does it contain …?", "〜が はいって いますか"], ["持ち帰り", "takeaway", "もちかえり"], ["店内で", "to eat in", "てんないで"], ["ごちそうさまでした", "thank you for the meal (on leaving)", null]]}, {"c": "Shopping", "items": [["袋をください", "a bag, please", "ふくろを ください"], ["袋はいりません", "I don't need a bag", "ふくろは いりません"], ["カードで払えますか", "can I pay by card?", "カードで はらえますか"], ["現金", "cash", "げんきん"], ["レシート", "receipt", null], ["試着してもいいですか", "may I try this on?", "しちゃく しても いいですか"], ["サイズ", "size", null], ["もっと大きいの", "a bigger one", "もっと おおきいの"], ["もっと小さいの", "a smaller one", "もっと ちいさいの"], ["他の色", "another colour", "ほかの いろ"], ["免税", "tax free", "めんぜい"], ["税込", "tax included", "ぜいこみ"], ["これください", "I'll take this", null], ["見ているだけです", "I'm just looking", "みて いる だけです"], ["温めますか", "shall I heat it up? (convenience store)", "あたためますか"], ["お箸", "chopsticks", "おはし"], ["ポイントカード", "point card", null]]}, {"c": "Hotel", "items": [["チェックイン", "check-in", null], ["チェックアウト", "check-out", null], ["予約しています", "I have a reservation", "よやく して います"], ["予約番号", "booking number", "よやく ばんごう"], ["何時からですか", "from what time?", "なんじからですか"], ["荷物を預かっていただけますか", "could you hold my luggage?", "にもつを あずかって いただけますか"], ["部屋", "room", "へや"], ["鍵", "key", "かぎ"], ["朝食", "breakfast", "ちょうしょく"], ["大浴場", "large communal bath", "だいよくじょう"], ["浴衣", "yukata", "ゆかた"], ["Wi-Fiのパスワード", "Wi-Fi password", "ワイファイの パスワード"], ["タオル", "towel", null], ["エアコン", "air conditioning", null], ["延長できますか", "can I extend?", "えんちょう できますか"], ["近くに〜はありますか", "is there a … nearby?", "ちかくに 〜は ありますか"]]}, {"c": "With family", "items": [["子供", "child", "こども"], ["子供用", "for children", "こどもよう"], ["子供椅子はありますか", "do you have a high chair?", "こども いすは ありますか"], ["ベビーカー", "stroller", null], ["おむつ替え台", "nappy-changing table", "おむつがえ だい"], ["授乳室", "nursing room", "じゅにゅうしつ"], ["エレベーター", "lift", null], ["ベビーカーで入れますか", "can I get in with a stroller?", "ベビーカーで はいれますか"], ["子供料金", "child fare", "こども りょうきん"], ["小学生", "primary-school child", "しょうがくせい"], ["家族連れ", "family with children", "かぞくづれ"], ["取り皿をください", "small plates, please", "とりざらを ください"], ["少なめでお願いします", "a smaller portion, please", "すくなめで おねがいします"], ["トイレはどこですか", "where is the toilet?", null], ["多目的トイレ", "accessible/family toilet", "たもくてき トイレ"]]}, {"c": "Health", "items": [["薬局", "pharmacy", "やっきょく"], ["ドラッグストア", "drugstore", null], ["病院", "hospital", "びょういん"], ["熱がある", "have a fever", "ねつが ある"], ["頭が痛い", "headache", "あたまが いたい"], ["お腹が痛い", "stomach ache", "おなかが いたい"], ["喉が痛い", "sore throat", "のどが いたい"], ["風邪", "a cold", "かぜ"], ["下痢", "diarrhoea", "げり"], ["酔い止め", "motion sickness medicine", "よいどめ"], ["絆創膏", "plaster / band-aid", "ばんそうこう"], ["痛み止め", "painkiller", "いたみどめ"], ["アレルギー", "allergy", null], ["この薬を飲んでいます", "I'm taking this medicine", "この くすりを のんで います"], ["保険", "insurance", "ほけん"], ["子供が熱を出しました", "my child has a fever", "こどもが ねつを だしました"], ["救急車", "ambulance", "きゅうきゅうしゃ"]]}, {"c": "Trouble", "items": [["助けてください", "please help", "たすけて ください"], ["道に迷いました", "I'm lost", "みちに まよいました"], ["財布をなくしました", "I lost my wallet", "さいふを なくしました"], ["電車に忘れました", "I left it on the train", "でんしゃに わすれました"], ["忘れ物センター", "lost and found", "わすれもの センター"], ["警察", "police", "けいさつ"], ["交番", "police box", "こうばん"], ["盗まれました", "it was stolen", "ぬすまれました"], ["予約が見つかりません", "my booking can't be found", "よやくが みつかりません"], ["間違いだと思います", "I think there's a mistake", "まちがいだと おもいます"], ["どうすればいいですか", "what should I do?", null], ["連絡してもいいですか", "may I make a call?", "れんらく しても いいですか"], ["充電できますか", "can I charge this?", "じゅうでん できますか"], ["Wi-Fiはありますか", "is there Wi-Fi?", "ワイファイは ありますか"]]}, {"c": "Numbers", "items": [["一人 / 二人 / 三人", "1 / 2 / 3 people", "ひとり / ふたり / さんにん"], ["一枚 / 二枚", "1 / 2 flat things (tickets)", "いちまい / にまい"], ["一つ / 二つ / 三つ", "1 / 2 / 3 items", "ひとつ / ふたつ / みっつ"], ["一泊 / 二泊", "1 / 2 nights", "いっぱく / にはく"], ["何時", "what time", "なんじ"], ["午前 / 午後", "a.m. / p.m.", "ごぜん / ごご"], ["今日 / 明日 / 明後日", "today / tomorrow / day after", "きょう / あした / あさって"], ["百 / 千 / 万", "100 / 1,000 / 10,000", "ひゃく / せん / まん"], ["三千円", "3,000 yen", "さんぜんえん"], ["一万円", "10,000 yen", "いちまんえん"], ["半分", "half", "はんぶん"], ["〜分後", "in … minutes", "〜ふんご"], ["〜時間", "… hours", "〜じかん"], ["何番", "what number", "なんばん"]]}];
+const D=[{"t": "Immigration", "s": "At the arrivals desk. Short answers are correct here — don't over-explain.", "l": [["Staff", "目的は何ですか。", "What is the purpose of your visit?", "目的[もくてき]は何[なん]ですか。"], ["You", "観光です。家族旅行です。", "Sightseeing. It's a family trip.", "観光[かんこう]です。家族[かぞく]旅行[りょこう]です。"], ["Staff", "何日間滞在しますか。", "How many days will you stay?", "何日間[なんにちかん]滞在[たいざい]しますか。"], ["You", "一週間です。", "One week.", "一週間[いっしゅうかん]です。"], ["Staff", "どちらに泊まりますか。", "Where will you be staying?", "どちらに泊[と]まりますか。"], ["You", "東京のホテルです。予約表があります。", "A hotel in Tokyo. I have the booking here.", "東京[とうきょう]のホテルです。予約表[よやくひょう]があります。"]]}, {"t": "Taxi", "s": "Show the address on your phone as you say it. Doors open automatically — don't touch them.", "l": [["You", "このホテルまでお願いします。", "To this hotel, please.", "このホテルまでお願[ねが]いします。"], ["Driver", "かしこまりました。少し混んでいますね。", "Certainly. It's a bit busy, isn't it.", "かしこまりました。少[すこ]し混[こ]んでいますね。"], ["You", "どのくらいかかりますか。", "About how long will it take?", "どのくらいかかりますか。"], ["Driver", "三十分ぐらいだと思います。", "About thirty minutes, I'd say.", "三十分[さんじゅっぷん]ぐらいだと思[おも]います。"], ["You", "カードで払えますか。", "Can I pay by card?", "カードで払[はら]えますか。"], ["Driver", "はい、大丈夫です。", "Yes, that's fine.", "はい、大丈夫[だいじょうぶ]です。"]]}, {"t": "Convenience store", "s": "The shortest, most repeatable interaction in Japan. Get this automatic in week 1.", "l": [["Staff", "いらっしゃいませ。", "Welcome.", "いらっしゃいませ。"], ["Staff", "温めますか。", "Shall I heat this up?", "温[あたた]めますか。"], ["You", "はい、お願いします。", "Yes, please.", "はい、お願[ねが]いします。"], ["Staff", "袋はご利用ですか。", "Would you like a bag?", "袋[ふくろ]はご利用[りよう]ですか。"], ["You", "大丈夫です。", "No, I'm fine.", "大丈夫[だいじょうぶ]です。"], ["Staff", "五百二十円になります。", "That comes to 520 yen.", "五百二十円[ごひゃくにじゅうえん]になります。"], ["You", "カードでお願いします。", "By card, please.", "カードでお願[ねが]いします。"]]}, {"t": "Ticket window", "s": "At みどりの窓口. Write the date and train down on paper as backup.", "l": [["You", "すみません、京都までの切符を買いたいんですが。", "Excuse me, I'd like to buy tickets to Kyoto.", "すみません、京都[きょうと]までの切符[きっぷ]を買[か]いたいんですが。"], ["Staff", "何名様ですか。", "How many people?", "何名様[なんめいさま]ですか。"], ["You", "大人二人と子供一人です。", "Two adults and one child.", "大人[おとな]二人[ふたり]と子供[こども]一人[ひとり]です。"], ["Staff", "指定席と自由席、どちらになさいますか。", "Reserved or unreserved seating?", "指定席[していせき]と自由席[じゆうせき]、どちらになさいますか。"], ["You", "指定席でお願いします。並んで座れますか。", "Reserved, please. Can we sit together?", "指定席[していせき]でお願[ねが]いします。並[なら]んで座[すわ]れますか。"], ["Staff", "はい、お取りできます。少々お待ちください。", "Yes, I can arrange that. One moment please.", "はい、お取[と]りできます。少々[しょうしょう]お待[ま]ちください。"]]}, {"t": "Asking directions", "s": "Expect the answer to use ～と and ～たら. Listen for the landmark, not every word.", "l": [["You", "すみません、この住所はどこか分かりますか。", "Excuse me, do you know where this address is?", "すみません、この住所[じゅうしょ]はどこか分[わ]かりますか。"], ["Passerby", "ああ、この道をまっすぐ行くと信号があります。", "Ah, go straight along this road and there's a traffic light.", "ああ、この道[みち]をまっすぐ行[い]くと信号[しんごう]があります。"], ["Passerby", "そこを右に曲がると、左側にありますよ。", "Turn right there and it's on your left.", "そこを右[みぎ]に曲[ま]がると、左側[ひだりがわ]にありますよ。"], ["You", "歩いて何分ぐらいですか。", "About how many minutes on foot?", "歩[ある]いて何分[なんぷん]ぐらいですか。"], ["Passerby", "五分ぐらいですね。", "About five minutes.", "五分[ごふん]ぐらいですね。"], ["You", "ありがとうございます。助かりました。", "Thank you. That's a big help.", "ありがとうございます。助[たす]かりました。"]]}, {"t": "Restaurant", "s": "You'll be asked party size before you're through the door. Have the number ready.", "l": [["Staff", "何名様ですか。", "How many in your party?", "何名様[なんめいさま]ですか。"], ["You", "四人です。", "Four.", "四人[よにん]です。"], ["Staff", "こちらへどうぞ。", "This way, please.", "こちらへどうぞ。"], ["You", "すみません、英語のメニューはありますか。", "Excuse me, do you have an English menu?", "すみません、英語[えいご]のメニューはありますか。"], ["Staff", "ございます。少々お待ちください。", "We do. One moment please.", "ございます。少々[しょうしょう]お待[ま]ちください。"], ["You", "子供が卵アレルギーなんですが、これは卵が入っていますか。", "My child has an egg allergy — does this contain egg?", "子供[こども]が卵[たまご]アレルギーなんですが、これは卵[たまご]が入[はい]っていますか。"], ["Staff", "確認してまいります。", "I'll go and check.", "確認[かくにん]してまいります。"]]}, {"t": "Paying", "s": "The 一緒 / 別々 question catches almost everyone. Decide before you reach the till.", "l": [["You", "お会計お願いします。", "The bill, please.", "お会計[かいけい]お願[ねが]いします。"], ["Staff", "お会計はご一緒でよろしいでしょうか。", "Would you like to pay together?", "お会計[かいけい]はご一緒[いっしょ]でよろしいでしょうか。"], ["You", "一緒でお願いします。", "Together, please.", "一緒[いっしょ]でお願[ねが]いします。"], ["Staff", "レシートはご利用ですか。", "Would you like the receipt?", "レシートはご利用[りよう]ですか。"], ["You", "はい、お願いします。ごちそうさまでした。", "Yes, please. Thank you for the meal.", "はい、お願[ねが]いします。ごちそうさまでした。"]]}, {"t": "Shop counter", "s": "Tax-free needs your passport. Bring it if you're planning to buy anything substantial.", "l": [["You", "すみません、これの大きいサイズはありますか。", "Excuse me, do you have this in a larger size?", "すみません、これの大[おお]きいサイズはありますか。"], ["Staff", "お調べいたします。少々お待ちください。", "I'll check. One moment please.", "お調[しら]べいたします。少々[しょうしょう]お待[ま]ちください。"], ["Staff", "こちらでいかがでしょうか。", "How about this one?", "こちらでいかがでしょうか。"], ["You", "いいですね。試着してもいいですか。", "That's good. May I try it on?", "いいですね。試着[しちゃく]してもいいですか。"], ["You", "免税できますか。パスポートがあります。", "Can I get this tax free? I have my passport.", "免税[めんぜい]できますか。パスポートがあります。"]]}, {"t": "Check-in", "s": "Say your booking name slowly and be ready to show the confirmation.", "l": [["You", "チェックインお願いします。予約しています。", "Check-in, please. I have a reservation.", "チェックインお願[ねが]いします。予約[よやく]しています。"], ["Staff", "お名前をお願いいたします。", "Your name, please.", "お名前[なまえ]をお願[ねが]いいたします。"], ["You", "〜と申します。二泊です。", "My name is …. Two nights.", "〜と申[もう]します。二泊[にはく]です。"], ["Staff", "確認いたしました。朝食は七時からでございます。", "Confirmed. Breakfast is from seven o'clock.", "確認[かくにん]いたしました。朝食[ちょうしょく]は七時[しちじ]からでございます。"], ["You", "荷物を預かっていただけますか。", "Could you hold my luggage?", "荷物[にもつ]を預[あず]かっていただけますか。"], ["Staff", "かしこまりました。", "Certainly.", "かしこまりました。"]]}, {"t": "Kids in a restaurant", "s": "Japanese restaurants are generally very accommodating — you just have to ask.", "l": [["You", "すみません、子供椅子はありますか。", "Excuse me, do you have a high chair?", "すみません、子供[こども]椅子[いす]はありますか。"], ["Staff", "はい、お持ちいたします。", "Yes, I'll bring one.", "はい、お持[も]ちいたします。"], ["You", "取り皿を三つお願いします。", "Three small plates, please.", "取[と]り皿[ざら]を三[みっ]つお願[ねが]いします。"], ["You", "子供用のメニューはありますか。", "Is there a children's menu?", "子供用[こどもよう]のメニューはありますか。"], ["Staff", "お子様セットがございます。", "We have a children's set.", "お子様[こさま]セットがございます。"], ["You", "じゃあ、それを一つお願いします。", "Then one of those, please.", "じゃあ、それを一[ひと]つお願[ねが]いします。"]]}, {"t": "Pharmacy", "s": "Pharmacists will ask about symptoms. Point and name the body part — it's enough.", "l": [["You", "すみません、子供が熱を出したんですが。", "Excuse me, my child has a fever.", "すみません、子供[こども]が熱[ねつ]を出[だ]したんですが。"], ["Pharmacist", "何歳ですか。", "How old are they?", "何歳[なんさい]ですか。"], ["You", "六歳です。喉も痛いと言っています。", "Six. They say their throat hurts too.", "六歳[ろくさい]です。喉[のど]も痛[いた]いと言[い]っています。"], ["Pharmacist", "こちらのお薬はいかがでしょうか。", "How about this medicine?", "こちらのお薬[くすり]はいかがでしょうか。"], ["You", "一日に何回飲みますか。", "How many times a day should they take it?", "一日[いちにち]に何回[なんかい]飲[の]みますか。"], ["Pharmacist", "一日三回、食後に飲んでください。", "Three times a day, after meals.", "一日[いちにち]三回[さんかい]、食後[しょくご]に飲[の]んでください。"]]}, {"t": "Lost item", "s": "Japan's lost-property system is genuinely excellent. Go to a station office or 交番 and ask.", "l": [["You", "すみません、電車にかばんを忘れてしまいました。", "Excuse me, I left my bag on the train.", "すみません、電車[でんしゃ]にかばんを忘[わす]れてしまいました。"], ["Staff", "何線の何時ごろの電車でしょうか。", "Which line, and around what time?", "何線[なにせん]の何時[なんじ]ごろの電車[でんしゃ]でしょうか。"], ["You", "山手線で、三時ごろだと思います。", "The Yamanote line, around three o'clock I think.", "山手線[やまのてせん]で、三時[さんじ]ごろだと思[おも]います。"], ["Staff", "どんなかばんですか。", "What kind of bag?", "どんなかばんですか。"], ["You", "黒くて、小さいリュックです。", "A small black backpack.", "黒[くろ]くて、小[ちい]さいリュックです。"], ["Staff", "お調べいたしますので、少々お待ちください。", "I'll look into it — one moment please.", "お調[しら]べいたしますので、少々[しょうしょう]お待[ま]ちください。"]]}, {"t": "Asking a favour", "s": "When you need to escalate politeness, ～ていただけませんか is the tool.", "l": [["You", "すみません、写真を撮っていただけませんか。", "Excuse me, could you take a photo for us?", "すみません、写真[しゃしん]を撮[と]っていただけませんか。"], ["Passerby", "いいですよ。", "Sure.", "いいですよ。"], ["You", "ありがとうございます。ここを押してください。", "Thank you. Press here, please.", "ありがとうございます。ここを押[お]してください。"], ["You", "もう一枚お願いできますか。", "Could I ask for one more?", "もう一枚[いちまい]お願[ねが]いできますか。"], ["You", "ありがとうございました。助かりました。", "Thank you very much. That helped.", "ありがとうございました。助[たす]かりました。"]]}];
+const S=[{"c": "Station", "items": [["入口", "entrance", "いりぐち"], ["出口", "exit", "でぐち"], ["東口", "east exit", "ひがしぐち"], ["西口", "west exit", "にしぐち"], ["北口", "north exit", "きたぐち"], ["南口", "south exit", "みなみぐち"], ["改札", "ticket gate", "かいさつ"], ["精算所", "fare adjustment", "せいさんじょ"], ["乗換", "transfer", "のりかえ"], ["〜番線", "platform no.", "〜ばんせん"], ["上り / 下り", "inbound / outbound", "のぼり / くだり"], ["切符売場", "ticket sales", "きっぷ うりば"], ["時刻表", "timetable", "じこくひょう"], ["運賃", "fare", "うんちん"], ["各停", "local train", "かくてい"], ["終点", "final stop", "しゅうてん"]]}, {"c": "Street", "items": [["注意", "caution", "ちゅうい"], ["危険", "danger", "きけん"], ["工事中", "under construction", "こうじちゅう"], ["立入禁止", "no entry", "たちいり きんし"], ["自転車", "bicycle", "じてんしゃ"], ["歩行者", "pedestrian", "ほこうしゃ"], ["交番", "police box", "こうばん"], ["案内所", "information desk", "あんないじょ"], ["観光案内", "tourist information", "かんこう あんない"], ["現在地", "you are here", "げんざいち"], ["徒歩五分", "5 min walk", "とほ ごふん"], ["駐車場", "car park", "ちゅうしゃじょう"]]}, {"c": "Shop", "items": [["営業中", "open for business", "えいぎょうちゅう"], ["準備中", "not yet open / preparing", "じゅんびちゅう"], ["本日休業", "closed today", "ほんじつ きゅうぎょう"], ["定休日", "regular closing day", "ていきゅうび"], ["会計 / レジ", "checkout", "かいけい / レジ"], ["税込 / 税抜", "tax incl. / excl.", "ぜいこみ / ぜいぬき"], ["割引", "discount", "わりびき"], ["半額", "half price", "はんがく"], ["売切れ", "sold out", "うりきれ"], ["免税", "duty free", "めんぜい"], ["現金のみ", "cash only", "げんきんのみ"], ["セルフ", "self-service", null]]}, {"c": "General", "items": [["禁止", "prohibited", "きんし"], ["ご遠慮ください", "please refrain", "ごえんりょ ください"], ["使用中", "in use / occupied", "しようちゅう"], ["空室", "vacant", "くうしつ"], ["満席", "fully booked", "まんせき"], ["予約", "reservation", "よやく"], ["受付", "reception", "うけつけ"], ["非常口", "emergency exit", "ひじょうぐち"], ["手洗 / お手洗い", "toilet", "てあらい / おてあらい"], ["多目的", "multi-purpose / accessible", "たもくてき"], ["エレベーター", "lift", null], ["平日 / 土日祝", "weekdays / weekends & holidays", "へいじつ / どにちしゅく"]]}];
+
+/* ============ render ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const ruby=s=>esc(s).replace(/([\u4E00-\u9FFF\u3005]+)\[([^\]]+)\]/g,"<ruby>$1<rt>$2</rt></ruby>");
+
+function dayKey(w,d){return w+"-"+d}
+
+function renderPlan(){
+  // today box
+  const total=36, doneN=Object.values(state.done).filter(Boolean).length;
+  let next=null;
+  outer: for(const wk of PLAN){ for(let i=0;i<wk.days.length;i++){
+    if(!state.done[dayKey(wk.n,i+1)]){ next={wk,d:wk.days[i],i:i+1}; break outer; }
+  }}
+  $("#todaybox").innerHTML = next ? `
+    <div class="today">
+      <div class="meta"><span>Week ${next.wk.n} · Day ${next.i}</span><span>${next.d.m} min</span></div>
+      <div class="focus">${esc(next.d.f)}</div>
+      <ul>${next.d.k.map(k=>`<li>${esc(k)}</li>`).join("")}</ul>
+    </div>`
+  : `<div class="today"><div class="focus">All 36 days stamped.</div><ul><li>Re-run your three weakest dialogues out loud. Then stop studying and enjoy the trip.</li></ul></div>`;
+
+  $("#weeks").innerHTML = PLAN.map(wk=>`
+    <div class="week">
+      <div class="week-hd"><span class="wn">Week ${wk.n}</span><span class="wt">${esc(wk.t)}</span></div>
+      <div class="week-note">${esc(wk.note)}</div>
+      ${wk.days.map((d,i)=>{
+        const k=dayKey(wk.n,i+1), on=!!state.done[k];
+        return `<div class="day ${on?"done":""}">
+          <button class="stamp ${on?"done":""}" data-k="${k}" aria-label="Mark day ${i+1} done">${on?"済":i+1}</button>
+          <div class="day-body">
+            <div class="day-focus">${esc(d.f)}</div>
+            <div class="day-tasks">${d.k.map(x=>`<span>${esc(x)}</span>`).join("")}</div>
+            <div class="day-mins">${d.m} min</div>
+          </div></div>`;
+      }).join("")}
+    </div>`).join("");
+
+  $("#pbar").style.width=(doneN/total*100)+"%";
+  $("#ptext").textContent=`${doneN} of ${total} days stamped`;
+
+  document.querySelectorAll(".stamp").forEach(b=>b.onclick=async e=>{
+    e.stopPropagation();
+    const k=b.dataset.k; state.done[k]=!state.done[k];
+    await store.set("jp-trip",JSON.stringify(state)); renderPlan();
+  });
+}
+
+let gWeek="all";
+function renderGram(){
+  const weeks=["all",1,3,4];
+  $("#gchips").innerHTML=weeks.map(w=>`<button class="chip ${gWeek==w?"on":""}" data-w="${w}">${w==="all"?"All":"Week "+w}</button>`).join("");
+  const list=G.filter(g=>gWeek==="all"||g.w==gWeek);
+  $("#glist").innerHTML=list.map((g,i)=>`
+    <div class="entry" data-i="${i}">
+      <div class="e-head">
+        <div style="flex:1;min-width:0">
+          <div class="e-jp">${esc(g.jp)}</div>
+          <div class="e-en">${esc(g.en)}</div>
+        </div>
+        <span class="e-tag">W${g.w}</span>
+      </div>
+      <div class="e-detail">
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="flex:1"><div class="e-ex">${ruby(g.exr)}</div><div class="e-exen">${esc(g.exen)}</div></div>
+          <button class="say" data-say="${esc(g.ex)}" aria-label="Play">▶</button>
+        </div>
+        ${g.note?`<div class="e-note">${esc(g.note)}</div>`:""}
+      </div>
+    </div>`).join("");
+  bindEntries("#glist");
+  document.querySelectorAll("#gchips .chip").forEach(c=>c.onclick=()=>{gWeek=c.dataset.w==="all"?"all":+c.dataset.w;renderGram();});
+}
+
+let vCat=V[0].c;
+function renderVocab(){
+  $("#vchips").innerHTML=V.map(v=>`<button class="chip ${vCat===v.c?"on":""}" data-c="${v.c}">${v.c}</button>`).join("");
+  const set=V.find(v=>v.c===vCat);
+  $("#vlist").innerHTML=set.items.map(([jp,en,rd])=>`
+    <div class="entry">
+      <div class="e-head">
+        <div style="flex:1;min-width:0"><div class="e-jp">${esc(jp)}</div>${rd?`<div class="e-read">${esc(rd)}</div>`:""}<div class="e-en">${esc(en)}</div></div>
+        <button class="say" data-say="${esc(jp)}" aria-label="Play">▶</button>
+      </div>
+    </div>`).join("");
+  bindEntries("#vlist");
+  document.querySelectorAll("#vchips .chip").forEach(c=>c.onclick=()=>{vCat=c.dataset.c;renderVocab();});
+}
+
+function renderDlg(){
+  $("#dlist").innerHTML=D.map(d=>`
+    <div class="dlg">
+      <h3>${esc(d.t)}</h3>
+      <p class="scene">${esc(d.s)}</p>
+      ${d.l.map(([who,jp,en,rb])=>`
+        <div class="line ${who==="You"?"you":""}">
+          <div class="who">${esc(who)}</div>
+          <div class="line-body"><div class="line-jp">${ruby(rb)}</div><div class="line-en">${esc(en)}</div></div>
+          <button class="say" data-say="${esc(jp)}" aria-label="Play">▶</button>
+        </div>`).join("")}
+    </div>`).join("");
+  bindSay("#dlist");
+}
+
+let sCat="all";
+function renderSigns(){
+  const cats=["all",...S.map(s=>s.c)];
+  $("#schips").innerHTML=cats.map(c=>`<button class="chip ${sCat===c?"on":""}" data-c="${c}">${c==="all"?"All":c}</button>`).join("");
+  const sets=sCat==="all"?S:S.filter(s=>s.c===sCat);
+  $("#slist").innerHTML=sets.map(set=>`
+    <div style="margin-bottom:18px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:7px">${esc(set.c)}</div>
+      <div class="signgrid">
+        ${set.items.map(([jp,en,rd])=>`<div class="sign"><div class="s-jp">${esc(jp)}</div>${rd?`<div class="s-read">${esc(rd)}</div>`:""}<div class="s-en">${esc(en)}</div></div>`).join("")}
+      </div>
+    </div>`).join("");
+  document.querySelectorAll(".sign").forEach(s=>s.onclick=()=>s.classList.toggle("open"));
+  document.querySelectorAll("#schips .chip").forEach(c=>c.onclick=()=>{sCat=c.dataset.c;renderSigns();});
+}
+
+function bindEntries(sel){
+  document.querySelectorAll(sel+" .entry").forEach(e=>e.onclick=ev=>{
+    if(ev.target.closest(".say"))return;
+    e.classList.toggle("open");
+  });
+  bindSay(sel);
+}
+function bindSay(sel){
+  document.querySelectorAll(sel+" .say").forEach(b=>b.onclick=ev=>{ev.stopPropagation();say(b.dataset.say);});
+}
+
+/* hide-English toggles */
+[["#ghide","#p-gram"],["#vhide","#p-vocab"],["#dhide","#p-phr"],["#shide","#p-sign"]].forEach(([btn,pane])=>{
+  $(btn).onclick=()=>{
+    const on=$(pane).classList.toggle("hidden-en");
+    $(btn).classList.toggle("on",on);
+    $(btn).textContent=on?"Show English":"Hide English";
+  };
+});
+
+/* furigana */
+["#gfuri","#dfuri"].forEach(id=>{
+  $(id).onclick=()=>{
+    const off=document.body.classList.toggle("no-furigana");
+    ["#gfuri","#dfuri"].forEach(b=>{
+      $(b).classList.toggle("on",!off);
+      $(b).textContent=off?"Furigana off":"Furigana on";
+    });
+  };
+});
+
+/* tabs */
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".pane").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on"); $("#p-"+t.dataset.p).classList.add("on");
+  window.scrollTo(0,0);
+});
+
+/* countdown */
+function renderCount(){
+  $("#tripdate").value=state.trip;
+  const t=new Date(state.trip+"T00:00:00"), now=new Date();
+  now.setHours(0,0,0,0);
+  const d=Math.round((t-now)/86400000);
+  $("#days").textContent=isNaN(d)?"–":(d<0?0:d);
+}
+$("#tripdate").onchange=async e=>{ state.trip=e.target.value; await store.set("jp-trip",JSON.stringify(state)); renderCount(); };
+
+/* boot */
+(async()=>{
+  try{ const raw=await store.get("jp-trip"); if(raw){ const p=JSON.parse(raw); state={...state,...p}; } }catch(e){}
+  renderCount(); renderPlan(); renderGram(); renderVocab(); renderDlg(); renderSigns();
+  // fail loudly rather than silently losing progress
+  let ok=false;
+  try{ localStorage.setItem("jp-test","1"); localStorage.removeItem("jp-test"); ok=true; }catch(e){}
+  if(!ok){
+    const p=document.querySelector("#ptext");
+    p.textContent="Stamps won't save — this browser is blocking storage. Turn off Private Browsing, or open the site directly rather than through a preview.";
+    p.style.opacity="1"; p.style.color="#FFB4A2";
+  }
+})();
+</script>
+</body>
+</html>
